@@ -1,3 +1,7 @@
+#THINGS TO BE CAREFUL ABOUT
+# 5V???? HELP?????
+# Make sure this isnt python 2
+
 import time
 import serial
 serialport = serial.Serial('/dev/ttyUSB0',9600, timeout=1)
