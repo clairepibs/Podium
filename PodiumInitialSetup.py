@@ -43,13 +43,16 @@ negXtrig = 3
 negYtrig = 4
 
 #pendant pins 
-save_pos_pin = 29
-zero_reset_pin = 31
-speed_rotpot = 10
+save_but = 29
+zero_but = 31
 up_but = 15
 down_but = 19
 right_but = 21
 left_but = 23 
+
+# Sequence of test points
+sequence = []
+index = 0
 
 #enable pin as either output or input
 GPIO.setup(dir_x,GPIO.OUT)
@@ -105,3 +108,4 @@ nom_accel = 0
 # y_loc_abs
 # zero_x
 # zero_y
+# index of list
