@@ -15,7 +15,7 @@
 
 #-----------------------------------------------------------------------------
 
-def stop():
+def stop(void):
 	'''
 	Stops motors immediately (no jarring control)
 	INPUTS:     None
@@ -46,7 +46,7 @@ def step(motor, delay):
 #-----------------------------------------------------------------------------
 
 
-def start_up():
+def cleanup():
 	'''
 	Moves motors to (0,0), set speed to nominal, reset reference ('zero point') to (0,0).
 	INPUTS:    
@@ -170,6 +170,17 @@ def accel_control():
 
 #-----------------------------------------------------------------------------
 
+def add_coord(void):
+    '''
+    Sends motors to tared zero location
+    
+    INPUTS:     
+    OUTPUTS:    
+    '''
+    pass
+
+#-----------------------------------------------------------------------------
+
 def send2zero():
     '''
     Sends motors to tared zero location
@@ -211,58 +222,7 @@ def pot_speed():
 
 #-----------------------------------------------------------------------------
 
-def move_pend(direc):
-	'''
-	move!
-    
-    INPUTS:     direction (value is pin of button being pressed)
-    OUTPUTS:    None
-    '''
-    
-    # Initialize variables
-	global x_loc_abs
-	global y_loc_abs
-	count = 0
-	
-	# Set direction of movement and motor pin
-	if direc = up_but:
-		GPIO.output(dir_y, up)
-		motor = pul_y
-	if direc = down_but:
-		GPIO.output(dir_y, down)
-		motor = pul_y
-	if direc = right_but:
-		GPIO.output(dir_x, right)
-		motor = pul_x
-	if direc = left_but:
-		GPIO.output(dir_x, left)
-		motor = pul_x
-	
-	while GPIO.input(direc) == False:
-		delay = pot_speed()
-		step(motor, delay)
-		
-		# Increase step count by 1
-		count += count
-		
-		# Check if limits have been hit
-		check_lims()
-	
-	# Implement jarring control
-	
-	# Change coordinates
-	if direc = up_but:
-		y_loc_abs = count + y_loc_abs
-	if direc = down_but:
-		y_loc_abs = count - y_loc_abs
-	if direc = right_but:
-		x_loc_abs = count + x_loc_abs
-	if direc = left_but:
-		x_loc_abs = count - x_loc_abs
-
-#-----------------------------------------------------------------------------
-
-def lcd_print():
+def printLCD():
     '''
     Prints input input onto LCD screen.
     
@@ -274,5 +234,16 @@ def lcd_print():
 #-----------------------------------------------------------------------------
 
 # GUI SPECIFIC
+
+#-----------------------------------------------------------------------------
+
+def move_GUI(dest_x, dest_y):
+    '''
+    Sends motors to target location (LOCAL COORDINATES, NOT ABSOLUTE)
+    
+    INPUTS:     
+    OUTPUTS:    
+    '''
+    pass
 
 #-----------------------------------------------------------------------------
