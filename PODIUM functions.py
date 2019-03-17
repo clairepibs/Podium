@@ -16,24 +16,23 @@
 #-----------------------------------------------------------------------------
 
 def stop():
-    '''
+	'''
 	Stops motors immediately (no jarring control)
-    
-    INPUTS:     None
-    OUTPUTS:    None
-    '''
-    GPIO.output(pul_x, LOW)
-    GPIO.ouput(pul_y, LOW)
+	INPUTS:     None
+	OUTPUTS:    None
+	'''
+	GPIO.output(pul_x, LOW)
+ 	GPIO.ouput(pul_y, LOW)
 
 #-----------------------------------------------------------------------------
 
 def step(motor, delay):
-    '''
+	'''
 	One step
-    
-    INPUTS:     motor to move, delay (s)
-    OUTPUTS:    None
-    '''
+	
+	INPUTS:     motor to move, delay (s)
+	OUTPUTS:    None
+	'''
 	
 	# set pulse to high
 	GPIO.output(motor, HIGH)
@@ -48,13 +47,11 @@ def step(motor, delay):
 
 
 def start_up():
-    '''
-    Moves motors to (0,0), set speed to nominal, reset reference ('zero point')
-    to (0,0).
-    
-    INPUTS:    
-    OUTPUTS:    
-    '''
+	'''
+	Moves motors to (0,0), set speed to nominal, reset reference ('zero point') to (0,0).
+	INPUTS:    
+	OUTPUTS:    
+	'''
 	
 	global x_loc_abs
 	global y_loc_abs
@@ -62,14 +59,14 @@ def start_up():
 	global y_loc
 	global zero_x
 	global zero_y
+	
+	# Send motors to neg limits
+	send_lim(lim_x_neg)
+	send_lim(lim_y_neg)
     
-    # Send motors to neg limits
-    send_lim(lim_x_neg)
-    send_lim(lim_y_neg)
-    
-    # Set coordinates and zero to (0,0)
-    x_loc_abs = 0
-    y_loc_abs = 0
+	# Set coordinates and zero to (0,0)
+	x_loc_abs = 0
+	y_loc_abs = 0
 	x_loc = 0
 	y_loc = 0
 	zero_x = 0
@@ -78,12 +75,12 @@ def start_up():
 #-----------------------------------------------------------------------------
     
 def send_lim(lim):
-    '''
-    Sends motor to given limit at nominal speed.
-    
-    INPUTS:     limit switch to move to (pin number)
-    OUTPUTS:    
-    '''
+	'''
+	Sends motor to given limit at nominal speed.
+	
+	INPUTS:     limit switch to move to (pin number)
+	OUTPUTS:    
+	'''
 	
 	global x_loc_abs
 	global y_loc_abs
@@ -101,10 +98,10 @@ def send_lim(lim):
 		motor = pul_y
 		GPIO.output(dir_y, down)
     
-    # Move while limit switch not triggered
-    while GPIO.input(lim) == False:
+	# Move while limit switch not triggered
+	while GPIO.input(lim) == False:
 		delay = nominalSpeed
-        step(motor, delay)
+		step(motor, delay)
 		
 	# Set appropriate location to 0
 	if lim == lim_x_pos:
@@ -114,7 +111,7 @@ def send_lim(lim):
 	if lim == lim_y_pos:
 		y_loc_abs = max_y
 	if lim == lim_y_neg:
-        y_loc_abs = 0
+		y_loc_abs = 0
 
 #-----------------------------------------------------------------------------
 
@@ -130,7 +127,7 @@ def check_lims():
     # Might not need T/F outputs if just printing onto screens
     
 	if GPTO.input(lim_x_pos) == True:
-    	stop()
+		stop()
 		return posXtrig
 	if GPTO.input(lim_x_neg) == True:
 		stop()
@@ -146,18 +143,34 @@ def check_lims():
 
 #-----------------------------------------------------------------------------
 
-def send2zero():
-    '''
-    Sends motors to tared zero location
+def set_zero():
+	'''
+	Sends motors to tared zero location
+	ENSURE YOU RESET LOCAL COORDINATES TO ZERO OUTSIDE FUNCTION
     
-    INPUTS:     
-    OUTPUTS:    
+	INPUTS:     
+	OUTPUTS:    
+	'''
+	global zero_x
+	global zero_y
+	
+	# Set new zero coordinates
+	zero_x = x_loc_abs
+	zero_y = y_loc_abs
+
+#-----------------------------------------------------------------------------
+
+def accel_control():
+    '''
+	Stops motors immediately (no jarring control)
+	INPUTS:     None
+	OUTPUTS:    None
     '''
     pass
 
 #-----------------------------------------------------------------------------
 
-def set_zero():
+def send2zero():
     '''
     Sends motors to tared zero location
     
