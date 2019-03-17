@@ -12,8 +12,6 @@ def pend_control():
 	global y_loc_abs
 	global x_loc
 	global y_loc
-	
-	delay = nom_speed
     
 	# Pop-up on GUI to avoid simultaneous use????????
 	
@@ -21,10 +19,35 @@ def pend_control():
 	GPIO.add_event_detect(zero_but, GPIO.BOTH, callback = set_zero)
 	GPIO.add_event_detect(save_but, GPIO.BOTH, callback = add_coord)
 	
+	# Setup motors and directions
+	if GPIO.input(right_but) == False:
+		GPIO.output(dir_x, right)
+		direc = right_but
+		loc = x_loc
+		
+		move_pend(right_but, pul_x)
+	elif GPIO.input(left_but) == False:
+		move_pend(left_but)
+	elif GPIO.input(up_but) == False:
+		move_pend(up_but)
+	elif GPIO.input(down_but) == False:
+		move_pend(down_but)
 	
-	
-	
-	
+	# Move loop
+	while GPIO.input(direc) == False:
+		delay = pot_speed()
+		step(motor, delay)
+		
+		# Increase location by 1
+		count += count
+		
+		# Check if limits have been hit
+		check_lims()
+		
+		# Print location on LCD
+		printLCD()
+		
+	# Implement jarring control
 	
 	
 	
