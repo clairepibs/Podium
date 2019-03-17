@@ -1,3 +1,5 @@
+# NOTE THIS IS ALREADY IN PODIUM FUNCTIONS
+
 def pend_control():
 	'''
 	Reads buttons and potentiometer on pendant, moves motor
@@ -22,99 +24,70 @@ def pend_control():
 	# Setup motors and directions
 	if GPIO.input(right_but) == False:
 		GPIO.output(dir_x, right)
-		direc = right_but
-		loc = x_loc
+		while GPIO.input(right_but) == False:
+			delay = pot_speed()
+			step(pul_x, delay)
 		
-		move_pend(right_but, pul_x)
+			# Increase location by 1
+			x_loc_abs += x_loc_abs
+			x_loc += x_loc
+		
+			# Check if limits have been hit
+			check_lims()
+		
+			# Print location on LCD
+			printLCD(x_loc, y_loc)
+			
 	elif GPIO.input(left_but) == False:
-		move_pend(left_but)
+		GPIO.output(dir_x, left)
+		while GPIO.input(left_but) == False:
+			delay = pot_speed()
+			step(pul_x, delay)
+		
+			# Increase location by 1
+			x_loc_abs -= x_loc_abs
+			x_loc -= x_loc
+		
+			# Check if limits have been hit
+			check_lims()
+		
+			# Print location on LCD
+			printLCD(x_loc, y_loc)
+			
 	elif GPIO.input(up_but) == False:
-		move_pend(up_but)
+		GPIO.output(dir_y, right)
+		while GPIO.input(up_but) == False:
+			delay = pot_speed()
+			step(pul_y, delay)
+		
+			# Increase location by 1
+			y_loc_abs += y_loc_abs
+			y_loc += y_loc
+		
+			# Check if limits have been hit
+			check_lims()
+		
+			# Print location on LCD
+			printLCD(x_loc, y_loc)
+			
 	elif GPIO.input(down_but) == False:
-		move_pend(down_but)
+		GPIO.output(dir_y, right)
+		while GPIO.input(down_but) == False:
+			delay = pot_speed()
+			step(pul_y, delay)
+		
+			# Increase location by 1
+			y_loc_abs -= y_loc_abs
+			y_loc -= y_loc
+		
+			# Check if limits have been hit
+			check_lims()
+		
+			# Print location on LCD
+			printLCD(x_loc, y_loc)
 	
-	# Move loop
-	while GPIO.input(direc) == False:
-		delay = pot_speed()
-		step(motor, delay)
-		
-		# Increase location by 1
-		count += count
-		
-		# Check if limits have been hit
-		check_lims()
-		
-		# Print location on LCD
-		printLCD()
-		
 	# Implement jarring control
 	
+	# Set absolute and local coordinates
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-    
-    # Check X-axis buttons
-    if right:
-        GPIO.output(dir_x, pos_x)           # Set direction to positive x
-        while right:            
-            # Check speed of motor, and set delay time
-            delay = speed_control()
-            
-            # Move up one step
-            move(pul_x, delay)
-            
-            # Count steps
-            stepCount_x += stepCount_x
-            
-            # Print location on LCD screen every X seconds???
-                
-    if left:
-        GPIO.output(dir_x, !pos_x)
-        while left:
-            # Check speed of motor, and set delay time
-            delay = speed_control()
-            
-            # Move up one step
-            move(pul_x, delay)
-            
-            # Count steps
-            stepCount_x -= stepCount_x
-    
-    # Check Y-axis buttons
-    if up:
-        GPIO.output(dir_y, pos_y)
-        while up:
-            # Check speed of motor, and set delay time
-            delay = speed_control()
-            
-            # Move up one step
-            move(pul_y, delay)
-            
-            # Count steps
-            stepCount_y += stepCount_y
-    if down:
-        GPIO.output(dir_y, !pos_y)
-        while down:
-            # Check speed of motor, and set delay time
-            delay = speed_control()
-            
-            # Move up one step
-            move(pul_y, delay)
-            
-            # Count steps
-            stepCount_y -= stepCount_y
