@@ -102,7 +102,7 @@ nom_accel = 0
 #-----------------------------------------------------------------------------
 
 # LIST OF GLOBAL VARIABLES THAT ARE CHANGED
-# x_loc
+# x_loc = x_loc_abs-zero_x
 # y_loc
 # x_loc_abs
 # y_loc_abs
