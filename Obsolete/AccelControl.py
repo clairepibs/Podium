@@ -30,8 +30,3 @@ def accel_control(desired_speed,current_speed,direction,motor,direction_pin):
             move(motor, speed)
             count -=1
 ## once while loop finishes will be at desired speed
-        
-    
-    
-    
-    
