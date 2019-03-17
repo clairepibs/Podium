@@ -6,27 +6,41 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
-#programming the GPIO by Board numbers
-GPIO.setmode(GPIO.BOARD) 
+import busio
+import digitalio
+import board
+import adafruit_mcp3xxx.mcp3008 as MCP
+from adafruit_mcp3xxx.analog_in import AnalogIn
+
+#programming the GPIO by Board numbers (see board pinout)
+GPIO.setmode(GPIO.BCM) 
 GPIO.setwarnings(False) #do not show any warnings
- 
-#define inputs and outputs 
 
-#Stepper motor outputs
-dir_x = 5
-pul_x = 7
-dir_y = 35
-pul_y = 37
+# INITIALIZE VARIABLES
 
-#define stepper motor directions
-CW = 1
-CCW = 0
+# Stepper motor outputs
+dir_x = 2
+pul_x = 3
+dir_y = 
+pul_y = 
 
-#Limit switch pins
+# define stepper motor directions
+up = 1
+down = 0
+right = 1
+left = 0
+
+# Limit switch pins
 lim_x_pos = 32
 lim_x_neg = 36
 lim_y_pos = 38
 lim_y_neg = 40 
+
+# Limit switch trigger flags
+posXtrig = 1
+posYtrig = 2
+negXtrig = 3
+negYtrig = 4
 
 #pendant pins 
 save_pos_pin = 29
@@ -43,31 +57,50 @@ GPIO.setup(pul_x,GPIO.OUT)
 GPIO.setup(dir_y,GPIO.OUT)
 GPIO.setup(pul_y,GPIO.OUT)
 
-GPIO.setup(lim_x_pos,GPIO.IN)
-GPIO.setup(lim_x_neg,GPIO.IN)
-GPIO.setup(lim_y_pos,GPIO.IN)
-GPIO.setup(lim_y_neg,GPIO.IN)
+# Set GPIO switch input pins for internal resistance
+GPIO.setup(up_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(down_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(right_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(left_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-GPIO.setup(save_pos_pin,GPIO.IN)
-GPIO.setup(zero_reset_pin,GPIO.IN)
-GPIO.setup(up_but,GPIO.IN)
-GPIO.setup(down_but,GPIO.IN)
-GPIO.setup(right_but,GPIO.IN)
-GPIO.setup(left_but,GPIO.IN)
+GPIO.setup(save_pos_pin,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(zero_reset_pin,GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-#read values from input 
-up = GPIO.input(up_but)
-down = GPIO.input(down_but)
-right = GPIO.input(right_but)
-left = GPIO.input(left_but)
+GPIO.setup(lim_x_pos,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(lim_x_neg,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(lim_y_pos,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+GPIO.setup(lim_y_neg,GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-save_position = GPIO.input(save_pos_pin)
-zero_reset = GPIO.input(zero_reset_pin)
+# Setup for potentiometer reading
 
+# create the spi bus
+spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
+# create the cs (chip select)
+cs = digitalio.DigitalInOut(board.D22)
 
+# create the mcp object
+mcp = MCP.MCP3008(spi, cs)
 
+# create an analog input channel on pin 0
+chan = AnalogIn(mcp, MCP.P0)
 
+#-----------------------------------------------------------------------------
+# VARIABLES TO CHANGE FOR CALIBRATION
 
+# max x and y locations (mm)
+max_x = 200
+max_y = 200
 
+# Set a nominal speed (delay in secs)
+nom_speed = 0.0001
 
+#-----------------------------------------------------------------------------
+
+# LIST OF GLOBAL VARIABLES THAT ARE CHANGED
+# x_loc
+# y_loc
+# x_loc_abs
+# y_loc_abs
+# zero_x
+# zero_y
