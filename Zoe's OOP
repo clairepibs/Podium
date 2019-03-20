@@ -129,11 +129,9 @@ def hard_stop():
     INPUTS:     None
     OUTPUTS:    None
     '''
-#    GPIO.output(pul_x, LOW)
-#    GPIO.output(pul_y, LOW)
-    pass
-    
-#-----------------------------------------------------------------------------
+    GPIO.output(pul_x, LOW)
+    GPIO.output(pul_y, LOW)
+    #pass
     
 def pot_speed():
     '''
@@ -150,8 +148,7 @@ def pot_speed():
     delay_min = 0.00001
     
     # Read pot
-    #volt = chan.value
-    volt=5000
+    volt = chan.value
     
     # Conversion
     volt_range = volt_max - volt_min
@@ -159,11 +156,30 @@ def pot_speed():
     delay = abs(volt*delay_range/volt_range-delay_max)
     
     return delay
-     
-#-----------------------------------------------------------------------------
-     
-def check_lim_pend(lim):
-    print('checking ', lim)
+          
+def check_lim_pend():
+    '''
+    This function checks if limit switches have been hit.
+    
+    INPUTS:        
+    OUTPUTS:  Returns limit switch flag or "false" if no switch has been hit   
+    '''
+    #print('checking ', lim)
+    
+	if GPTO.input(lim_x_pos) == True:
+		stop()
+		return posXtrig
+	if GPTO.input(lim_x_neg) == True:
+		stop()
+		return posYtrig
+	if GPTO.input(lim_y_pos) == True:
+		stop()
+		return negXtrig
+	if GPTO.input(lim_y_neg) == True:
+		stop()
+		return negYtrig
+	else:
+		return False
 
 #-----------------------------------------------------------------------------
 
@@ -173,11 +189,23 @@ def printLCD():
 #-----------------------------------------------------------------------------
 
 def step(motor, delay):
-    pass
+    '''
+	One step of motor at certain speed
+	
+	INPUTS:     motor to move, delay (s)
+	OUTPUTS:    None
+	'''
+	
+	# set pulse to high
+	GPIO.output(motor, HIGH)
+	# delay for ON (min 10 us)
+	time.sleep(delay)
+	# set pulse to low
+	GPIO.output(motor, LOW)
+	# delay for OFF
+	time.sleep(delay)
 
 #-----------------------------------------------------------------------------
-
-
 # SET UP MOTORS FOR REFERENCE
 #-----------------------------------------------------------------------------
 class MotorControl:
@@ -250,8 +278,9 @@ class MotorControl:
         
         print('Now location is ({},{})'.format(str(x_loc_abs), str(y_loc_abs)))
 
+#-----------------------------------------------------------------------------
 
-# SET DIRECTION OPTIONS
+# SET DIRECTION OPTION CLASSES
 class up (MotorControl):
     
     def __init__(self):
@@ -303,7 +332,8 @@ class left (MotorControl):
         self.but = left_but
         self.flag = negXtrig
         print('Initialized left')
-
+  
+#-----------------------------------------------------------------------------
 # UNIVERSAL FUNCTIONS (FOR PENDANT AND GUI)
 #-----------------------------------------------------------------------------
 
@@ -359,8 +389,6 @@ def add_coord(void):
     index += 1
     
     printLCD()
-    
-#-----------------------------------------------------------------------------
 
 def set_zero_pend():
     '''
@@ -384,6 +412,4 @@ def set_zero_pend():
     
     # Print new location on LCD
     printLCD()
-
-#-----------------------------------------------------------------------------
 
