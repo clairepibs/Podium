@@ -1,1 +1,389 @@
 
+# This is a test library for motor control by pendant using OOP
+# Created on 2019-03-17 by Zoe LeHong
+
+# LIST OF GLOBAL VARIABLES THAT ARE TRACKED WITHIN PROGRAM
+# x_loc = x_loc_abs-zero_x
+# y_loc
+# x_loc_abs
+# y_loc_abs
+# zero_x
+# zero_y
+# index of list
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# VARIABLES TO CHANGE FOR CALIBRATION
+
+# max x and y locations (mm)
+max_x = 200
+max_y = 200
+
+# Set a nominal speed (delay in secs)
+nom_speed = 0.0001
+nom_accel = 0
+
+# define stepper motor directions
+up = 1
+down = 0
+right = 1
+left = 0
+#-----------------------------------------------------------------------------
+
+# IMPORT AND INITIALIZE
+
+#import RPi.GPIO as GPIO
+from time import sleep
+#import busio
+#import digitalio
+#import board
+#import adafruit_mcp3xxx.mcp3008 as MCP
+#from adafruit_mcp3xxx.analog_in import AnalogIn
+
+# INITIALIZE VARIABLES
+
+# Limit switch trigger flags
+posXtrig = 1
+posYtrig = 2
+negXtrig = 3
+negYtrig = 4
+
+# Sequence of test points
+sequence = []
+index = 0
+
+y_loc_abs = 0
+x_loc_abs = 0
+y_loc = 0
+x_loc = 0
+
+# INITIALIZE GPIO PINS
+
+#programming the GPIO by Board numbers (see board pinout)
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setwarnings(False)
+
+# Stepper motor outputs
+dir_x = 2
+pul_x = 3
+dir_y = 4
+pul_y = 5
+
+# Limit switch pins
+lim_x_pos = 32
+lim_x_neg = 36
+lim_y_pos = 38
+lim_y_neg = 40 
+
+#pendant pins 
+save_but = 29
+zero_but = 31
+up_but = 15
+down_but = 19
+right_but = 21
+left_but = 23 
+
+##enable pin as either output or input
+#GPIO.setup(dir_x,GPIO.OUT)
+#GPIO.setup(pul_x,GPIO.OUT)
+#GPIO.setup(dir_y,GPIO.OUT)
+#GPIO.setup(pul_y,GPIO.OUT)
+#
+## Set GPIO switch input pins for internal resistance
+#GPIO.setup(up_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(down_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(right_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(left_but, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#
+#GPIO.setup(save_pos_pin,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(zero_reset_pin,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#
+#GPIO.setup(lim_x_pos,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(lim_x_neg,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(lim_y_pos,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+#GPIO.setup(lim_y_neg,GPIO.IN, pull_up_down = GPIO.PUD_UP)
+
+## SETUP FOR POTENTIOMETER READING
+## create the spi bus
+#spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+#
+## create the cs (chip select)
+#cs = digitalio.DigitalInOut(board.D22)
+#
+## create the mcp object
+#mcp = MCP.MCP3008(spi, cs)
+#
+## create an analog input channel on pin 0
+#chan = AnalogIn(mcp, MCP.P0)
+    
+#-----------------------------------------------------------------------------
+# FUNCTIONS THAT ARE USED IN MOTOR CONTROL
+#-----------------------------------------------------------------------------
+
+def hard_stop():
+    '''
+ Stops motors immediately (no jarring control)
+    
+    INPUTS:     None
+    OUTPUTS:    None
+    '''
+#    GPIO.output(pul_x, LOW)
+#    GPIO.output(pul_y, LOW)
+    pass
+    
+#-----------------------------------------------------------------------------
+    
+def pot_speed():
+    '''
+    This function converts reads voltage from 1ok potentiometer, and converts it to a delay time.
+    NOTE: MUST HAVE SPI SETUP WITH MCP3008 LIBRARY FOR USE
+    
+    INPUTS:        none
+    OUTPUTS:     delay (seconds)
+    '''
+    # Define speed/delay and rotpot values
+    volt_max = 65472
+    volt_min = 2000
+    delay_max = 0.01
+    delay_min = 0.00001
+    
+    # Read pot
+    #volt = chan.value
+    volt=5000
+    
+    # Conversion
+    volt_range = volt_max - volt_min
+    delay_range = delay_max - delay_min
+    delay = abs(volt*delay_range/volt_range-delay_max)
+    
+    return delay
+     
+#-----------------------------------------------------------------------------
+     
+def check_lim_pend(lim):
+    print('checking ', lim)
+
+#-----------------------------------------------------------------------------
+
+def printLCD():
+    pass
+
+#-----------------------------------------------------------------------------
+
+def step(motor, delay):
+    pass
+
+#-----------------------------------------------------------------------------
+
+
+# SET UP MOTORS FOR REFERENCE
+#-----------------------------------------------------------------------------
+class MotorControl:
+
+    def __init__(self):
+        self.direc = 0
+        self.dir = 0
+        self.axis = 0
+        self.step_fact_y = 0
+        self.step_fact_x = 0
+        self.lim = 0
+        self.but = 0
+        self.flag = 0
+        print('Initialized MotorControl')
+
+    def go_lim(self):
+        print('going to {} {} limit'.format(str(self.direc), str(self.axis)))
+
+    def move_pend(self, delay):
+        global y_loc_abs
+        global x_loc_abs
+        global y_loc
+        global x_loc
+        
+        # Set direction
+        #GPIO.output(self.direc, self.dir)
+        
+        print('Moving {} in {} drection' .format(str(self.axis), str(self.direc)))
+        while delay != 0:
+            # Read potentiometer
+            delay = pot_speed()
+            # Take a step
+            step(self.motor, delay)
+            # Change location
+            y_loc_abs += self.step_fact_y
+            x_loc_abs += self.step_fact_x
+            x_loc += self.step_fact_x
+            y_loc += self.step_fact_y
+            # Check limits and print location
+            check_lim_pend(self.lim)
+            printLCD()
+            
+            delay-=1 
+        print('Now location is ({},{})'.format(str(x_loc_abs), str(y_loc_abs)))
+    
+    def move_GUI(self, new):
+        # Assumes prior check to see if new coords exceed max
+        global y_loc_abs
+        global x_loc_abs
+        global y_loc
+        global x_loc
+        
+        dist = new - (x_loc*abs(self.step_fact_x) + y_loc*abs(self.step_fact_y))
+        print('Distance to move: ', dist)
+        
+        # Set direction
+        #GPIO.output(self.direc, self.dir)
+        
+        print('Moving to ',new)
+        for i in range(0,dist):
+            # Take a step
+            step(self.axis, nom_speed)
+            # Change location
+            x_loc_abs += self.step_fact_x
+            x_loc += self.step_fact_x
+            y_loc_abs += self.step_fact_y
+            y_loc += self.step_fact_y
+            printLCD()
+            # Might want to check lims here
+        
+        print('Now location is ({},{})'.format(str(x_loc_abs), str(y_loc_abs)))
+
+
+# SET DIRECTION OPTIONS
+class up (MotorControl):
+    
+    def __init__(self):
+        self.direc = dir_y
+        self.dir = up
+        self.axis = pul_y
+        self.step_fact_y = 1
+        self.step_fact_x = 0
+        self.lim = lim_y_pos
+        self.but = up_but
+        self.flag = posYtrig
+        print('Initialized up')
+        
+class down (MotorControl):
+    
+    def __init__(self):
+        self.direc = dir_y
+        self.dir = down
+        self.axis = pul_y
+        self.step_fact_y = -1
+        self.step_fact_x = 0
+        self.lim = lim_y_neg
+        self.but = down_but
+        self.flag = negYtrig
+        print('Initialized down')
+
+class right (MotorControl):
+    
+    def __init__(self):
+        self.direc = dir_x
+        self.dir = right
+        self.axis = pul_x
+        self.step_fact_y = 0
+        self.step_fact_x = 1
+        self.lim = lim_x_pos
+        self.but = right_but
+        self.flag = posXtrig
+        print('Initialized right')
+        
+class left (MotorControl):
+    
+    def __init__(self):
+        self.direc = dir_x
+        self.dir = left
+        self.axis = pul_x
+        self.step_fact_y = 0
+        self.step_fact_x = -1
+        self.lim = lim_x_neg
+        self.but = left_but
+        self.flag = negXtrig
+        print('Initialized left')
+
+# UNIVERSAL FUNCTIONS (FOR PENDANT AND GUI)
+#-----------------------------------------------------------------------------
+
+def cleanup():
+    '''
+    Moves motors to (0,0), set speed to nominal,
+    reset reference ('zero point') to (0,0).
+    INPUTS:    
+    OUTPUTS:    
+    '''
+    # Initialize global variables
+    global x_loc_abs
+    global y_loc_abs
+    global x_loc
+    global y_loc
+    global zero_x
+    global zero_y
+    
+    # Send motors to neg limits
+    down.go_lim()
+    left.go_lim()
+    
+    # Set coordinates and zero to (0,0)
+    x_loc_abs = 0
+    y_loc_abs = 0
+    x_loc = 0
+    y_loc = 0
+    zero_x = 0
+    zero_y = 0
+    
+#-----------------------------------------------------------------------------
+    
+def accel_control():
+    '''
+    This is jarring control
+    INPUTS:     None
+    OUTPUTS:    None
+    '''
+    pass
+
+#-----------------------------------------------------------------------------
+
+def add_coord(void):
+    '''
+    Adds a coordinate to list on GUI, increases index 
+    INPUTS:     
+    OUTPUTS:    
+    '''
+    global index
+    
+    sequence.append([x_loc_abs, y_loc_abs])
+    
+    index += 1
+    
+    printLCD()
+    
+#-----------------------------------------------------------------------------
+
+def set_zero_pend():
+    '''
+    Sets current location to zero, updates location trackers
+    
+    INPUTS:     
+    OUTPUTS:    
+    '''
+    global zero_x
+    global zero_y
+    global x_loc
+    global y_loc
+    
+    # Set new zero coordinates
+    zero_x = x_loc_abs
+    zero_y = y_loc_abs
+    
+    # Reset local coordinates
+    x_loc = 0
+    y_loc = 0
+    
+    # Print new location on LCD
+    printLCD()
+
+#-----------------------------------------------------------------------------
+
