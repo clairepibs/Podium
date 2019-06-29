@@ -10,12 +10,6 @@ import config as c
 
 # INITIALIZE VARIABLES
 
-# Limit switch trigger flags
-posXtrig = 1
-posYtrig = 2
-negXtrig = 3
-negYtrig = 4
-
 # Other flags
 stop_threads = 0
 HIGH = 1
@@ -373,14 +367,13 @@ class MainWindow(tkinter.Tk):
         print("Limit GUI Daemon started")
 
         while 1:
-##            if c.stop_lim_thread:
-##                c.stop_lim_thread = 0
-##                break
+            if c.stop_lim_thread:
+                c.stop_lim_thread = 0
+                break
             if GPIO.input(lim_y_pos) == False:
                 print('Pos y lim trig')
-                self.plusLimAnswerY['text'] = "Yes"
+                c.posYtrig = "Yes"
                 self.stop()
-                #mc.down.move_mm()
                 # Set direction
 ##                GPIO.output(mc.down.direc, mc.down.dir)
 ##                while GPIO.input(lim_y_pos) == False:
@@ -388,9 +381,8 @@ class MainWindow(tkinter.Tk):
                 continue
             elif GPIO.input(lim_y_neg) == False:
                 print('Neg y lim trig')
-                self.minusLimAnswerY['text'] = "Yes"
+                c.negYtrig = "Yes"
                 self.stop()
-                #mc.up.move_mm()
                 # Set direction
 ##                GPIO.output(mc.up.direc, mc.up.dir)
 ##                while GPIO.input(lim_y_neg) == False:
@@ -398,9 +390,8 @@ class MainWindow(tkinter.Tk):
                 continue
             elif GPIO.input(lim_x_pos) == False:
                 print('Pos x lim trig')
-                self.plusLimAnswerX['text'] = "Yes"
+                c.posXtrig = "Yes"
                 self.stop()
-##                mc.left.move_mm()
 ##                # Set direction
 ####                GPIO.output(mc.left.direc, mc.left.dir)
 ####                while GPIO.input(lim_x_pos) == False:
@@ -408,9 +399,8 @@ class MainWindow(tkinter.Tk):
                 continue
             elif GPIO.input(lim_x_neg) == False:
                 print('Neg x lim trig')
-                self.minusLimAnswerX['text'] = "Yes"
+                c.negXtrig = "Yes"
                 self.stop()
-##                mc.right.move_mm()
                 # Set direction
 ##                GPIO.output(mc.right.direc, mc.right.dir)
 ##                while GPIO.input(lim_x_neg) == False:
@@ -735,32 +725,14 @@ class MainWindow(tkinter.Tk):
         print('GUI print daemon starting')
 
         while 1:
-
-            #print("X: %.3f" %c.x_loc)
-            #print("Y: %.3f" %c.y_loc)
-
             self.currentPosAnswerX['text'] = ("%.3f" %c.x_loc)
             self.currentPosAnswerY['text'] = ("%.3f" %c.y_loc)
-
+            
             #Reset limit triggers to "No" -- this may be problematic
-            self.plusLimAnswerX['text'] = "No"
-            self.plusLimAnswerY['text'] = "No"
-            self.minusLimAnswerX['text'] = "No"
-            self.minusLimAnswerY['text'] = "No"
-
-##            #Check limit switches
-##            if mc.check_lim(None) == 1:
-##                print("Positive X Lim Triggered")
-##                self.plusLimAnswerX['text'] = "Yes"
-##            elif mc.check_lim(None) == 2:
-##                print("Positive Y Lim Triggered")
-##                self.plusLimAnswerY['text'] = "Yes"
-##            elif mc.check_lim(None) == 3:
-##                print("Negative X Lim Triggered")
-##                self.minusLimAnswerX['text'] = "Yes"
-##            elif mc.check_lim(None) == 4:
-##                print("Negative Y Lim Triggered")
-##                self.minusLimAnswerY['text'] = "Yes"
+            self.plusLimAnswerX['text'] = c.posXtrig
+            self.plusLimAnswerY['text'] = c.posYtrig
+            self.minusLimAnswerX['text'] = c.negXtrig
+            self.minusLimAnswerY['text'] = c.negYtrig
 
             sleep(0.25)
 
@@ -1096,7 +1068,6 @@ class MotorControlWindow(tkinter.Tk):
                         break
         print("Gui move daemon ending b/c end of sequence")
         
-
         if motoroption == ('X Axis'):
             self.PosAnswer['text'] = ("%.3f" % c.x_loc)
         elif motoroption == ('Y Axis'):
@@ -1164,11 +1135,6 @@ if __name__ == "__main__":
 
     GPIO.add_event_detect(zero_but, GPIO.FALLING, callback = mc.set_zero_pend, bouncetime = 500)
     GPIO.add_event_detect(save_but, GPIO.FALLING, callback = main.add_coord, bouncetime = 500)
-
-##    print(mc.up.nom_speed)
-##    print(mc.down.nom_speed)
-##    print(mc.right.nom_speed)
-##    print(mc.left.nom_speed)
 
     main.mainloop()
 
