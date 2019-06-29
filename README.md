@@ -1,3 +1,13 @@
+# RASPBERRY PI XQUARTZ SETUP - on a mac
+PI STARTUP: 
+1. Open XQuartz
+2. ssh -X pi@raspberrypi.local
+3. lxsession
+
+If pi@raspberrypi.local does not work, to find the pi type netstat -r in terminal to get IP address (replace the raspberrypi.local with the address)
+
+# RASPBERRY PI SSH CONNECTION ON WINDOWS
+
 
 # BELOW ARE THE INITIAL SETUP SCRIPTS AND DIRECTIVES FOR THE PI-VNC CONNECTION
 STEP 1: Download Raspbian onto the Pi (https://www.imore.com/how-get-started-using-raspberry-pi)
@@ -7,7 +17,9 @@ STEP 4: Setup Pi to open VNC at boot (https://mcuoneclipse.com/2016/12/27/vnc-se
 STEP 5: Make sure Pi does not require password to login (https://stackoverflow.com/questions/17830333/start-raspberry-pi-without-login)
     # NOTE: Make sure you select AutoDesktop and not AutoConsole!!!!!
 
-#Pot Setup:
+# ------------------------------------------------------------------
+# HARDWARE
+# Pot Setup:
 STEP 1: If using software SPI, enable SPI on pi
   sudo raspi-config
 STEP 2: Check if enabled: lsmod
