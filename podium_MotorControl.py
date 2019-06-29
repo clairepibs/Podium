@@ -117,12 +117,25 @@ def startup_lcd():
 #-----------------------------------------------------------------------------
 
 def shutoff_lcd():
+    '''
+    Turns off LCD
+    
+    INPUTS:     None
+    OUTPUTS:    None
+    '''
     lcdbackpack.display_off()
     #lcdbackpack.disconnect()
 
 #-----------------------------------------------------------------------------
 
 def stop_daemon():
+    '''
+    Stops all daemon threads through global thread flag
+    
+    INPUTS:     None
+    OUTPUTS:    None
+    '''
+    
     global stop_threads
     stop_threads = True
     
@@ -264,8 +277,8 @@ def soft_stop(delay):
 
 def cleanup():
     '''
-    Moves motors to (0,0), set speed to nominal,
-    reset reference ('zero point') to (0,0).
+    Moves motors to (0,0), set speed to nominal,resets reference ('zero point') to (0,0).
+    
     INPUTS:    
     OUTPUTS:    
     '''
@@ -293,8 +306,8 @@ def set_zero_pend(*args):
     '''
     Sets current location to zero, updates location trackers
     
-    INPUTS:     
-    OUTPUTS:    
+    INPUTS: None     
+    OUTPUTS: None (changes global variables in config)
     '''
     
     print('Setting new zero to current location')
@@ -317,9 +330,9 @@ def set_zero_pend(*args):
 # SET UP MOTORS FOR REFERENCE
 #-----------------------------------------------------------------------------
 class MotorControl:
-    
-    #from podium_gui import MainWindow
-
+    '''
+    This is the main motor control class, containing all direction-dependant objects/functions
+    '''
     def __init__(self):
         self.direc = 0
         self.dir = 0
@@ -553,12 +566,16 @@ class left (MotorControl):
         print('Initialized left')
 
 if __name__:
+    # Initialize instances of direction classes
     up = up()
     down = down()
     right = right()
     left = left()
+    
+    # Send to limits and reset zeros
     #cleanup()
-    # Initialize pendant LCD (clear and set up???)
+    
+    # Initialize pendant LCD
     startup_lcd()
-    GPIO.output(pul_x, HIGH)
-    GPIO.output(pul_y, HIGH)
+    #GPIO.output(pul_x, HIGH)
+    #GPIO.output(pul_y, HIGH)
