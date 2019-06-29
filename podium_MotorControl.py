@@ -1,4 +1,4 @@
-# This is a test library for motor control by pendant using OOP
+# This is the python script for PODIUM motor control and pendant
 # Created on 2019-03-17 by Zoe LeHong
 
 ##-----------------------------------------------------------------------------
@@ -16,14 +16,7 @@ from lcdbackpack import LcdBackpack
 import config as c
 import threading
 
-
 # INITIALIZE VARIABLES
-
-# Limit switch trigger flags
-posXtrig = 1
-posYtrig = 2
-negXtrig = 3
-negYtrig = 4
 
 # Other flags
 stop_threads = 0
@@ -194,45 +187,6 @@ def pot_speed(min):
 
     return delay
 
-#-----------------------------------------------------------------------------
-##
-##def check_lim(*args):
-##    '''
-##    This function checks if limit switches have been hit.
-##
-##    INPUTS:   None
-##    OUTPUTS:  Returns limit switch flag or "false" if no switch has been hit
-##    '''
-##    #pass
-##    print('Now checking limits')
-##
-##    while 1: 
-##        if c.stop_lim_thread:
-##            c.stop_lim_thread = 0
-##            break
-##        if GPIO.input(lim_x_pos) == False:
-##            print('Pos x lim trig')
-##            hard_stop()
-##            left.move_mm()
-##            break
-##        elif GPIO.input(lim_x_neg) == False:
-##            print('Neg x lim trig')
-##            hard_stop()
-##            right.move_mm()
-##            break
-##        elif GPIO.input(lim_y_pos) == False:
-##            print('Pos y lim trig')
-##            hard_stop()
-##            down.move_mm()
-##            break
-##        elif GPIO.input(lim_y_neg) == False:
-##            print('Neg y lim trig')
-##            hard_stop()
-##            up.move_mm()
-##            break
-##        else:
-##            pass
-
 # -----------------------------------------------------------------------------
 
 def check_save():
@@ -270,7 +224,6 @@ def check_zero():
         return True
     else:
         return False
-
 
 #-----------------------------------------------------------------------------
 
@@ -361,7 +314,6 @@ def set_zero_pend(*args):
     
 
 #-----------------------------------------------------------------------------
-
 # SET UP MOTORS FOR REFERENCE
 #-----------------------------------------------------------------------------
 class MotorControl:
@@ -390,7 +342,19 @@ class MotorControl:
         OUTPUTS:    None, but changes global location variables
         '''
         
-        #print('taking a step in {} direction' .format(str(self.axis)))
+        # Check if limit switch is hit
+        if c.posXtrig == "Yes":
+            print("Limit switch triggered, cannot move in positive X")
+            pass
+        if c.negXtrig == "Yes":
+            print("Limit switch triggered, cannot move in negative X")
+            pass
+        if c.posYtrig == "Yes":
+            print("Limit switch triggered, cannot move in positive Y")
+            pass
+        if c.negYtrig == "Yes":
+            print("Limit switch triggered, cannot move in negative Y")
+            pass
         
         # GPIO high
         GPIO.output(self.axis, HIGH)
