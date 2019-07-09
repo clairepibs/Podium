@@ -230,7 +230,7 @@ def check_zero():
     '''
 
     #print('Checking zero button')
-    pass
+    #pass
 
 
     if GPIO.input(zero_but) == True:
@@ -254,27 +254,6 @@ def hard_stop():
     
 #-----------------------------------------------------------------------------
 
-def soft_stop(delay):
-    '''
-    Stops motors with acceleration control
-    
-    INPUTS:     None
-    OUTPUTS:    None
-    '''
-    
-    # Not sure about this one
-    up.accel_control(delay, 0)
-    down.accel_control(delay, 0)
-    right.accel_control(delay, 0)
-    left.accel_control(delay, 0)
-
-##    GPIO.output(pul_x, HIGH)
-##    GPIO.output(pul_y, HIGH)
-    
-    print('Stopping motor')
-    
-#-----------------------------------------------------------------------------
-
 def cleanup():
     '''
     Moves motors to (0,0), set speed to nominal,resets reference ('zero point') to (0,0).
@@ -289,8 +268,8 @@ def cleanup():
     down.go_lim()
     left.go_lim()
     
-    GPIO.output(pul_x, HIGH)
-    GPIO.output(pul_y, HIGH)
+    #GPIO.output(pul_x, HIGH)
+    #GPIO.output(pul_y, HIGH)
     
     # Set coordinates and zero to (0,0)
     c.x_loc_abs = 0
@@ -342,7 +321,6 @@ class MotorControl:
         self.lim = 0
         self.but = 0
         self.flag = 0
-        self.trig_but = 0
         self.max_speed = 0
         self.nom_speed = 0
         print('Initialized MotorControl')
@@ -356,17 +334,8 @@ class MotorControl:
         '''
         
         # Check if limit switch is hit
-        if c.posXtrig == "Yes":
-            print("Limit switch triggered, cannot move in positive X")
-            pass
-        if c.negXtrig == "Yes":
-            print("Limit switch triggered, cannot move in negative X")
-            pass
-        if c.posYtrig == "Yes":
-            print("Limit switch triggered, cannot move in positive Y")
-            pass
-        if c.negYtrig == "Yes":
-            print("Limit switch triggered, cannot move in negative Y")
+        if self.flag == "Yes":
+            print("Limit switch triggered, cannot move")
             pass
         
         # GPIO high
@@ -380,9 +349,7 @@ class MotorControl:
         c.x_loc += self.step_fact_x*c.mm_per_step
         c.y_loc_abs += self.step_fact_y
         c.y_loc += self.step_fact_y*c.mm_per_step
-        
-        #check_lim(None)
-    
+            
     def accel_control(self, delay_old, delay_new):
         '''
         Prevents jarring, gradually increases/decreases speed
@@ -394,17 +361,16 @@ class MotorControl:
         print("stuck in acccel control")
         if abs(delay_new - delay_old) < c.nom_accel:
             print('Initializing accel control')
-            while round(delay_old, 4) != round(delay_new,4):
-                self.step(delay_old)
-                if delay_new - delay_old > 0:
-                    delay_old += c.nom_accel
-                else:
-                    delay_old -= c.nom_accel
-                print('Speed: ', delay_old)
-        
+            #if round(delay_old, 4) != round(delay_new, 4):
+            if delay_new - delay_old > 0:
+                delay_old += c.nom_accel
+                return delay_old
+            else:
+                delay_old -= c.nom_accel
+                return delay_old
         else:
             #print('No need for acceleration control')
-            pass
+            return delay_new
     
     def go_lim(self):
         '''
@@ -415,33 +381,42 @@ class MotorControl:
         '''
         
         print('going to {} {} limit'.format(str(self.direc), str(self.axis)))
-        print('THIS FUNCTIONALITY IS COMMENTED OUT UNTER FURTHER REFINING')
-
-##        if self.direc == dir_x:
-##            if self.dir == c.RIGHT:
-##                for i in range(c.x_loc_abs, c.max_x*c.steps_per_mm):
-##                    self.step(self.nom_speed)
-##            else:
-##                for i in range(c.x_loc_abs, 0):
-##                    self.step(self.nom_speed)
-##        elif self.direc == dir_y:
-##            if self.dir == c.UP:
-##                for i in range(c.y_loc_abs, c.max_y*c.steps_per_mm):
-##                    self.step(self.nom_speed)
-##            else:
-##                for i in range(c.y_loc_abs, 0):
-##                    self.step(self.nom_speed) 
         
-        #self.accel_control(0, self.nom_speed)
-##        GPIO.output(self.direc, self.dir)
-##        
-##        while GPIO.input(self.trig_but) == True:
-##            self.step(self.nom_speed)
-##
-        GPIO.output(pul_x, HIGH)
-        GPIO.output(pul_y, HIGH)
-            
-#        self.accel_control(c.nom_speed, 0) -- not sure how to deal with this one
+        # Move to limit until switch is pushed
+        while GPIO.input(self.lim) == True:
+            self.step(self.nom_speed)
+        
+        # Stop all motors
+        hard_stop()
+        
+        # Set limit switch flag
+        self.flag = "Yes"
+        
+        # Reset location counters if off
+        if self.dir == c.RIGHT:
+            c.x_loc_abs = c.x_loc = c.max_x
+        elif self.dir == c.LEFT:
+            c.x_loc_abs = c.x_loc = 0
+        elif self.dir == c.UP:
+            c.y_loc_abs = c.y_loc = c.max_y
+        elif self.dir == c.DOWN:
+            c.y_loc_abs = c.y_loc = 0
+
+        #GPIO.output(pul_x, HIGH)
+        #GPIO.output(pul_y, HIGH)
+
+    def soft_stop(self, speed):
+        '''
+        Stops motors with acceleration control
+
+        INPUTS:     None
+        OUTPUTS:    None
+        '''
+        while speed != 0:
+            # Compare old and new delay to implement accel control
+            speed = self.accel_control(speed, 0)
+            # Take a step
+            self.step(speed)
 
     def move_pend(self, *args):
         '''
@@ -455,26 +430,20 @@ class MotorControl:
                 
         delay_old = pot_speed(self.max_speed)
 
-##        limitcheck = threading.Thread(target = check_lim)
-##        limitcheck.setDaemon(True)
-##        limitcheck.start()
-
         #print('Moving {} in {} direction' .format(str(self.axis), str(self.direc)))
         
         while GPIO.input(self.but) == False:
             # Read potentiometer
-            #delay_new = pot_speed(self.max_speed)
+            delay_new = pot_speed(self.max_speed)
             # Compare old and new delay to implement accel control
-            #self.accel_control(delay_old, delay_new)
+            speed = self.accel_control(delay_old, delay_new)
             # Take a step
-            self.step(delay_old)
+            self.step(speed)
 
-        print("Button no longer pushed")
-
-        #c.stop_lim_thread = 1
+        #print("Button no longer pushed")
 
         # Acceleration control for stop
-        #self.accel_control(delay_new, 0)
+        soft_stop(speed)
         
         GPIO.output(pul_x, HIGH)
         GPIO.output(pul_y, HIGH)
@@ -494,27 +463,20 @@ class MotorControl:
         for i in range (0, c.steps_per_mm*2):
             self.step(self.nom_speed)
             
-        #self.accel_control(self.nom_speed, 0)
-
-##        GPIO.output(pul_x, HIGH)
-##        GPIO.output(pul_y, HIGH)
-#        
-
 # SET DIRECTION OPTIONS
 class up (MotorControl):
     
     def __init__(self):
-        self.direc = dir_y
-        self.dir = c.UP
-        self.axis = pul_y
-        self.step_fact_y = 1
+        self.direc = dir_y                          # Direction pin for motor
+        self.dir = c.UP                             # Direction for motor (1/0)
+        self.axis = pul_y                           # Pulse pin for motor
+        self.step_fact_y = 1                        # Multipliers for direction choosing
         self.step_fact_x = 0
-        self.lim = lim_y_pos
-        self.but = up_but
-        self.flag = posYtrig
-        self.trig_but = lim_y_pos
-        self.max_speed = c.delay_min_y
-        self.nom_speed = c.nom_speed_y
+        self.lim = lim_y_pos                        # Limit switch pin
+        self.but = up_but                           # Pendant button pin
+        self.flag = c.posYtrig                      # Limit switch trigger flag ("Yes"/"No")
+        self.max_speed = c.delay_min_y              # Max speed for motor
+        self.nom_speed = c.nom_speed_y              # Nominal speed for motor
         print('Initialized up')
         
 class down (MotorControl):
@@ -527,8 +489,7 @@ class down (MotorControl):
         self.step_fact_x = 0
         self.lim = lim_y_neg
         self.but = down_but
-        self.flag = negYtrig
-        self.trig_but = lim_y_neg
+        self.flag = c.negYtrig
         self.max_speed = c.delay_min_y
         self.nom_speed = c.nom_speed_y
         print('Initialized down')
@@ -543,8 +504,7 @@ class right (MotorControl):
         self.step_fact_x = 1
         self.lim = lim_x_pos
         self.but = right_but
-        self.flag = posXtrig
-        self.trig_but = lim_x_pos
+        self.flag = c.posXtrig
         self.max_speed = c.delay_min_x
         self.nom_speed = c.nom_speed_x
         print('Initialized right')
@@ -559,8 +519,7 @@ class left (MotorControl):
         self.step_fact_x = -1
         self.lim = lim_x_neg
         self.but = left_but
-        self.flag = negXtrig
-        self.trig_but = lim_x_neg
+        self.flag = c.negXtrig
         self.max_speed = c.delay_min_x
         self.nom_speed = c.nom_speed_x
         print('Initialized left')
