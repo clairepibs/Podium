@@ -354,8 +354,8 @@ class MotorControl:
         '''
         Prevents jarring, gradually increases/decreases speed
         
-        INPUTS:     old speed and new speed
-        OUTPUTS:    None, but changes global flag: stop_threads
+        INPUTS:     Old speed, new speed
+        OUTPUTS:    Returns incremental decrease/increase in speed as needed
         '''
         
         print("stuck in acccel control")
@@ -407,9 +407,9 @@ class MotorControl:
 
     def soft_stop(self, speed):
         '''
-        Stops motors with acceleration control
+        Stops gien motor with acceleration control
 
-        INPUTS:     None
+        INPUTS:     Current speed
         OUTPUTS:    None
         '''
         while speed != 0:
