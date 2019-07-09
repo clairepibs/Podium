@@ -5,3 +5,4 @@
  :: Open windows powershell, establish ssh connection with Pi
  
  http://steve-jansen.github.io/guides/windows-batch-scripting/part-2-variables.html
+ https://www.howtogeek.com/336775/how-to-enable-and-use-windows-10s-built-in-ssh-commands/
