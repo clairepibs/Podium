@@ -13,16 +13,22 @@ x_loc_abs = 0
 y_loc = 0
 x_loc = 0
 
+# Limit switch trigger flags
+posXtrig = 'No'
+posYtrig = 'No'
+negXtrig = 'No'
+negYtrig = 'No'
+
 #-----------------------------------------------------------------------------
 # VARIABLES TO CHANGE FOR CALIBRATION
 
 # max x and y locations (mm)
-max_x = 133
-max_y = 87
+max_x = 132
+max_y = 94
 
 # Set a nominal speed (delay in secs)
-nom_speed_x = 0.0005
-nom_speed_y = 0.0005
+nom_speed_x = 0.0004
+nom_speed_y = 0.0004
 nom_accel = 0.0005 # is max instantaneous change in speed
 
 # Define zeros
@@ -42,8 +48,8 @@ DOWN = 0
 RIGHT = 0
 LEFT = 1
 
-# steps per mm (steps per rotation = 400, rotation = 1.27 mm/rot)
-steps_per_mm = 315
+# steps per mm (steps per rotation = 200, rotation = 1.27 mm/rot or 0.05 in/rot)
+steps_per_mm = 314
 mm_per_step = round(1/steps_per_mm, 4)
 
 # flag to stop eveything
