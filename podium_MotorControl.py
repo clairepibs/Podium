@@ -179,7 +179,7 @@ def print_lcd_ind(index):
 
 #-----------------------------------------------------------------------------
 
-def pot_speed(min):
+def pot_speed(minimum):
     '''
     This function converts reads voltage from 1ok potentiometer, and converts it to a delay time.
     NOTE: MUST HAVE SPI SETUP WITH MCP3008 LIBRARY FOR USE
@@ -193,7 +193,7 @@ def pot_speed(min):
 
     # Conversion
     volt_range = c.volt_max - c.volt_min
-    delay_range = c.delay_max - min
+    delay_range = c.delay_max - minimum
     delay = abs(volt*delay_range/volt_range-c.delay_max)
 
     print('Speed: ', delay)
@@ -320,7 +320,7 @@ class MotorControl:
         self.step_fact_x = 0
         self.lim = 0
         self.but = 0
-        self.flag = 0
+        self.flag = 'No'
         self.max_speed = 0
         self.nom_speed = 0
         print('Initialized MotorControl')
@@ -334,10 +334,14 @@ class MotorControl:
         '''
         
         # Check if limit switch is hit
-        if self.flag == "Yes":
-            print("Limit switch triggered, cannot move")
-            pass
+        #if GPIO.input(self.lim) == False:
+        #if self.flag == 'Yes':
+            #print("Limit switch triggered, cannot move")
+            #pass
+        # Set direction
+        GPIO.output(self.direc, self.dir)
         
+        #else:
         # GPIO high
         GPIO.output(self.axis, HIGH)
         sleep(delay)
@@ -383,11 +387,12 @@ class MotorControl:
         print('going to {} {} limit'.format(str(self.direc), str(self.axis)))
         
         # Move to limit until switch is pushed
-        while GPIO.input(self.lim) == True:
+        while self.flag == "No":
+        #while GPIO.input(self.lim) != False:
             self.step(self.nom_speed)
         
-        # Stop all motors
-        hard_stop()
+        # Stop all motorss
+        #hard_stop()
         
         # Set limit switch flag
         self.flag = "Yes"
@@ -434,16 +439,16 @@ class MotorControl:
         
         while GPIO.input(self.but) == False:
             # Read potentiometer
-            delay_new = pot_speed(self.max_speed)
+            #delay_new = pot_speed(self.max_speed)
             # Compare old and new delay to implement accel control
-            speed = self.accel_control(delay_old, delay_new)
+            #speed = self.accel_control(delay_old, delay_new)
             # Take a step
-            self.step(speed)
+            self.step(delay_old)
 
         #print("Button no longer pushed")
 
         # Acceleration control for stop
-        soft_stop(speed)
+        #self.soft_stop(speed)
         
         GPIO.output(pul_x, HIGH)
         GPIO.output(pul_y, HIGH)
