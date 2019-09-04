@@ -124,7 +124,6 @@ def shutoff_lcd():
     OUTPUTS:    None
     '''
     lcdbackpack.display_off()
-    #lcdbackpack.disconnect()
 
 #-----------------------------------------------------------------------------
 
@@ -152,7 +151,6 @@ def print_pos_lcd():
     global stop_threads
 
     while 1:
-        #print('X: {:0.3f}, Y: {:0.3f}' .format(c.x_loc, c.y_loc))
 
         # Print location on LCD
         lcdbackpack.set_cursor_position(3,1)
@@ -210,10 +208,6 @@ def check_save():
     OUTPUTS:  Returns save flag or "false" if save button has not been hit
     '''
 
-    #print('Checking save button')
-    #pass
-
-
     if GPIO.input(save_but) == True:
         return True
     else:
@@ -228,11 +222,7 @@ def check_zero():
     INPUTS:   None
     OUTPUTS:  Returns save flag or "false" if zero button has not been hit
     '''
-
-    #print('Checking zero button')
-    #pass
-
-
+    
     if GPIO.input(zero_but) == True:
         return True
     else:
@@ -267,9 +257,6 @@ def cleanup():
     # Send motors to neg limits
     down.go_lim()
     left.go_lim()
-    
-    #GPIO.output(pul_x, HIGH)
-    #GPIO.output(pul_y, HIGH)
     
     # Set coordinates and zero to (0,0)
     c.x_loc_abs = 0
@@ -332,16 +319,10 @@ class MotorControl:
         INPUTS:     None
         OUTPUTS:    None, but changes global location variables
         '''
-        
-        # Check if limit switch is hit
-        #if GPIO.input(self.lim) == False:
-        #if self.flag == 'Yes':
-            #print("Limit switch triggered, cannot move")
-            #pass
+
         # Set direction
         GPIO.output(self.direc, self.dir)
         
-        #else:
         # GPIO high
         GPIO.output(self.axis, HIGH)
         sleep(delay)
@@ -365,7 +346,6 @@ class MotorControl:
         print("stuck in acccel control")
         if abs(delay_new - delay_old) < c.nom_accel:
             print('Initializing accel control')
-            #if round(delay_old, 4) != round(delay_new, 4):
             if delay_new - delay_old > 0:
                 delay_old += c.nom_accel
                 return delay_old
@@ -373,7 +353,6 @@ class MotorControl:
                 delay_old -= c.nom_accel
                 return delay_old
         else:
-            #print('No need for acceleration control')
             return delay_new
     
     def go_lim(self):
@@ -388,11 +367,7 @@ class MotorControl:
         
         # Move to limit until switch is pushed
         while self.flag == "No":
-        #while GPIO.input(self.lim) != False:
             self.step(self.nom_speed)
-        
-        # Stop all motorss
-        #hard_stop()
         
         # Set limit switch flag
         self.flag = "Yes"
@@ -406,9 +381,6 @@ class MotorControl:
             c.y_loc_abs = c.y_loc = c.max_y
         elif self.dir == c.DOWN:
             c.y_loc_abs = c.y_loc = 0
-
-        #GPIO.output(pul_x, HIGH)
-        #GPIO.output(pul_y, HIGH)
 
     def soft_stop(self, speed):
         '''
@@ -434,21 +406,10 @@ class MotorControl:
         GPIO.output(self.direc, self.dir)
                 
         delay_old = pot_speed(self.max_speed)
-
-        #print('Moving {} in {} direction' .format(str(self.axis), str(self.direc)))
         
         while GPIO.input(self.but) == False:
-            # Read potentiometer
-            #delay_new = pot_speed(self.max_speed)
-            # Compare old and new delay to implement accel control
-            #speed = self.accel_control(delay_old, delay_new)
             # Take a step
             self.step(delay_old)
-
-        #print("Button no longer pushed")
-
-        # Acceleration control for stop
-        #self.soft_stop(speed)
         
         GPIO.output(pul_x, HIGH)
         GPIO.output(pul_y, HIGH)
@@ -536,10 +497,5 @@ if __name__:
     right = right()
     left = left()
     
-    # Send to limits and reset zeros
-    #cleanup()
-    
     # Initialize pendant LCD
     startup_lcd()
-    #GPIO.output(pul_x, HIGH)
-    #GPIO.output(pul_y, HIGH)
