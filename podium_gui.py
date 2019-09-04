@@ -505,20 +505,15 @@ class MainWindow(tkinter.Tk):
 
         print("Send to positive X limit!")
         c.stopflag = 0
-
-        #mc.right.go_lim()
+        
         while c.posXtrig == "No":
-            #while GPIO.input(lim_x_neg) == True:
             mc.right.step(c.nom_speed_x)
             main.update()
             if c.stopflag == 1:
                 c.stopflag = 0
                 return
-
+            
         c.x_loc_abs = c.x_loc = c.max_x + 2
-
-        #moving_gui = threading.Thread(target = self.go(distx,0))
-        #moving_gui.start()
 
     def toLimMinusX(self):
         '''
@@ -531,9 +526,7 @@ class MainWindow(tkinter.Tk):
         print("Send to negative X limit!")
         c.stopflag = 0
 
-        #mc.left.go_lim()
         while c.negXtrig == "No":
-            #print("Moving to neg X")
             mc.left.step(c.nom_speed_x)
             main.update()
             if c.stopflag == 1:
@@ -543,8 +536,6 @@ class MainWindow(tkinter.Tk):
         c.x_loc_abs = c.x_loc = -2
 
         print("Made it to negative X")
-        #moving_gui = threading.Thread(target = self.go(distx,0))
-        #moving_gui.start()
 
     def toLimPlusY(self):
         '''
@@ -557,7 +548,6 @@ class MainWindow(tkinter.Tk):
         print("Send to positive Y limit!")
         c.stopflag = 0
 
-        #mc.up.go_lim()
         while c.posYtrig == "No":
             mc.up.step(c.nom_speed_y)
             main.update()
@@ -566,9 +556,6 @@ class MainWindow(tkinter.Tk):
                 return
 
         c.y_loc_abs = c.y_loc = c.max_y+2
-        
-        #moving_gui = threading.Thread(target = self.go(0,disty))
-        #moving_gui.start()
 
     def toLimMinusY(self):
         '''
@@ -581,7 +568,6 @@ class MainWindow(tkinter.Tk):
         print("Send to negative Y limit!")
         c.stopflag = 0
 
-        #mc.down.go_lim()
         while c.negYtrig == "No":
             mc.down.step(c.nom_speed_y)
             main.update()
@@ -593,8 +579,6 @@ class MainWindow(tkinter.Tk):
 
         c.stopflag = 0
         print("Made it to negative Y")
-        #moving_gui = threading.Thread(target = self.go(0,disty))
-        #moving_gui.start()
 
     def zeroAxisX(self):
         '''
@@ -736,13 +720,6 @@ class MainWindow(tkinter.Tk):
         distx = x - c.x_loc  # In mm
         disty = y - c.y_loc
 
-        #      if self.check_go(distx,disty) == False:
-        #      print("Error, outside of range!")
-        ##                    limanswer = tkinter.messagebox.askokcancel("Boundary Error",
-        ##                                                           "Point exceeds limit! Please enter new coordinate.")
-        ##                    if limanswer == 'ok':
-        ##                        return
-        #    else:
         c.stopflag = 0
         moving_gui = threading.Thread(target=self.go(distx, disty))
         moving_gui.start()
@@ -1343,10 +1320,8 @@ class MotorControlWindow(tkinter.Tk):
 
         if distx > c.max_x - (c.x_loc + c.zero_x) or distx < -1 * (c.x_loc + c.zero_x):
             print("Desired location exceeds max X coordinates by {}mm".format(str(distx)))
-            # return False
         elif disty > c.max_y - (c.y_loc + c.zero_y) or disty < -1 * (c.y_loc + c.zero_y):
             print("Desired location exceeds max Y coordinates by {}mm".format(str(disty)))
-            # return False
         else:
             return True
         return True
@@ -1435,13 +1410,6 @@ class MotorControlWindow(tkinter.Tk):
         distx = x - c.x_loc  # In mm
         disty = y - c.y_loc
 
-        ##        if self.check_move(distx, disty) == False:
-        ##            print("Error, outside of range!")
-        ##            limanswer = tkinter.messagebox.askokcancel("Boundary Error",
-        ##                                                       "Point exceeds limit! Please enter new coordinate.")
-        ##            if limanswer == 'ok':
-        ##                return
-
         c.stopflag = 0
         moving_motor_control = threading.Thread(target=self.move(distx, disty))
         moving_motor_control.start()
@@ -1481,17 +1449,9 @@ if __name__ == "__main__":
 
     main.geometry("800x500")
 
-    # c.stop_lim_thread = 1
-
-
-
     limitcheck = threading.Thread(target=main.lim_stop)
     limitcheck.setDaemon(True)
     limitcheck.start()
-
-##    printing_mot = threading.Thread(target=MotorControlWindow.print_pos_mot)
-##    printing_mot.setDaemon(True)
-##    printing_mot.start()
 
     # Start interrupts
     GPIO.add_event_detect(right_but, GPIO.FALLING, callback=mc.right.move_pend, bouncetime=400)
